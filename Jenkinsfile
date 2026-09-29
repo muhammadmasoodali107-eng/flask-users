@@ -20,6 +20,14 @@ pipeline {
             }
         }
 
+        stage('Check Kubernetes') {
+             steps {
+                sh 'kubectl version --client'
+                sh 'kubectl config current-context'
+                sh 'kubectl get nodes'
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 sh 'docker build -t flask-users:latest .'
