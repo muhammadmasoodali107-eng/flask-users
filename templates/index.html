@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Users</title>
+</head>
+<body>
+
+    <h1>Users</h1>
+
+    <ul>
+        {% for id, user in users.items() %}
+            <li>
+                <a href="/user/{{ id }}">
+                    {{ user.name }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+
+</body>
+</html>
