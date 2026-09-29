@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         PATH = "/Users/muhammadmasood/.docker/bin:/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+        DOCKER_IMAGE = "muhammadmasood107/flask-users"
     }
 
     stages {
@@ -44,6 +45,34 @@ pipeline {
         stage('Cleanup') {
             steps {
                 sh 'docker rm -f flask-users-test'
+            }
+        }
+
+        stage('Docker Hub Login') {
+            steps {
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'dockerhub-credentials',
+                        usernameVariable: 'DOCKER_USERNAME',
+                        passwordVariable: 'DOCKER_PASSWORD'
+                    )
+                ]) {
+                    sh '''
+                        echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+                    '''
+                }
+            }
+        }
+
+        stage('Tag Docker Image') {
+            steps {
+                sh 'docker tag flask-users:latest ${DOCKER_IMAGE}:latest'
+            }
+        }
+
+        stage('Push to Docker Hub') {
+            steps {
+                sh 'docker push ${DOCKER_IMAGE}:latest'
             }
         }
     }
