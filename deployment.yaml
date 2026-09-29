@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-users
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: flask-users
+  template:
+    metadata:
+      labels:
+        app: flask-users
+    spec:
+      containers:
+        - name: flask-users
+          image: muhammadmasood107/flask-users:latest
+          ports:
+            - containerPort: 5000

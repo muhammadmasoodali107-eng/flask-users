@@ -21,10 +21,29 @@ pipeline {
         }
 
         stage('Check Kubernetes') {
-             steps {
+            steps {
                 sh 'kubectl version --client'
                 sh 'kubectl config current-context'
                 sh 'kubectl get nodes'
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                sh '''
+            kubectl apply -f deployment.yaml
+            kubectl apply -f service.yaml
+            '''
+            }
+        }
+
+        stage('Verify Kubernetes Deployment') {
+            steps {
+                sh '''
+                kubectl rollout status deployment/flask-users
+                kubectl get pods -o wide
+                kubectl get service flask-users-service
+            '''
             }
         }
 
