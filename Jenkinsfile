@@ -22,9 +22,19 @@ pipeline {
 
         stage('Check Kubernetes') {
             steps {
-                sh 'kubectl version --client'
-                sh 'kubectl config current-context'
-                sh 'kubectl get nodes'
+                sh '''
+                export PATH="/Users/muhammadmasood/.docker/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+                export KUBECONFIG="/Users/muhammadmasood/.kube/config"
+
+                echo "kubectl version:"
+                kubectl version --client
+
+                echo "Current Kubernetes context:"
+                kubectl config current-context
+
+                echo "Kubernetes nodes:"
+                kubectl get nodes
+                '''
             }
         }
 
