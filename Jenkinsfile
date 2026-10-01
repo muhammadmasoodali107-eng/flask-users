@@ -27,16 +27,16 @@ pipeline {
         stage('Check Kubernetes / Minikube') {
             steps {
                 withKubeConfig([credentialsId: 'minikube-kubeconfig']) {
-                sh '''
-                echo "Kubernetes Client:"
-                kubectl version --client
+                    sh '''
+                        echo "Kubernetes Client:"
+                        kubectl version --client
 
-                echo "Current Context:"
-                kubectl config current-context
+                        echo "Current Context:"
+                        kubectl config current-context
 
-                echo "Kubernetes Nodes:"
-                kubectl get nodes
-                '''
+                        echo "Kubernetes Nodes:"
+                        kubectl get nodes
+                    '''
                 }
             }
         }
@@ -102,37 +102,36 @@ pipeline {
         stage('Deploy to Minikube') {
             steps {
                 withKubeConfig([credentialsId: 'minikube-kubeconfig']) {
-                sh '''
-                kubectl apply -f deployment.yaml
-                kubectl apply -f service.yaml
+                    sh '''
+                        kubectl apply -f deployment.yaml
+                        kubectl apply -f service.yaml
 
-                kubectl set image deployment/flask-users \
-                    flask-users=$DOCKER_IMAGE:$BUILD_NUMBER
+                        kubectl set image deployment/flask-users \
+                            flask-users=$DOCKER_IMAGE:$BUILD_NUMBER
 
-                kubectl rollout status deployment/flask-users --timeout=120s
-                '''
+                        kubectl rollout status deployment/flask-users --timeout=120s
+                    '''
                 }
             }
         }
 
-
         stage('Verify Kubernetes Deployment') {
             steps {
                 withKubeConfig([credentialsId: 'minikube-kubeconfig']) {
-                sh '''
-                echo "Pods:"
-                kubectl get pods -o wide
+                    sh '''
+                        echo "Pods:"
+                        kubectl get pods -o wide
 
-                echo "Deployment:"
-                kubectl get deployment flask-users
+                        echo "Deployment:"
+                        kubectl get deployment flask-users
 
-                echo "Service:"
-                kubectl get service flask-users-service
-                '''
+                        echo "Service:"
+                        kubectl get service flask-users-service
+                    '''
                 }
             }
-       }
-
+        }
+    }
 
     post {
         success {
