@@ -4,8 +4,6 @@ pipeline {
 
     environment {
         PATH = "/Users/muhammadmasood/.docker/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
-        KUBECONFIG = "/Users/muhammadmasood/.kube/config"
-
         DOCKER_IMAGE = "muhammadmasood107/flask-users"
     }
 
@@ -103,35 +101,38 @@ pipeline {
 
         stage('Deploy to Minikube') {
             steps {
+                withKubeConfig([credentialsId: 'minikube-kubeconfig']) {
                 sh '''
-                    kubectl config use-context minikube
+                kubectl apply -f deployment.yaml
+                kubectl apply -f service.yaml
 
-                    kubectl apply -f deployment.yaml
-                    kubectl apply -f service.yaml
+                kubectl set image deployment/flask-users \
+                    flask-users=$DOCKER_IMAGE:$BUILD_NUMBER
 
-                    kubectl set image deployment/flask-users \
-                        flask-users=$DOCKER_IMAGE:$BUILD_NUMBER
-
-                    kubectl rollout status deployment/flask-users --timeout=120s
+                kubectl rollout status deployment/flask-users --timeout=120s
                 '''
+                }
             }
         }
+
 
         stage('Verify Kubernetes Deployment') {
             steps {
+                withKubeConfig([credentialsId: 'minikube-kubeconfig']) {
                 sh '''
-                    echo "Pods:"
-                    kubectl get pods -o wide
+                echo "Pods:"
+                kubectl get pods -o wide
 
-                    echo "Deployment:"
-                    kubectl get deployment flask-users
+                echo "Deployment:"
+                kubectl get deployment flask-users
 
-                    echo "Service:"
-                    kubectl get service flask-users-service
+                echo "Service:"
+                kubectl get service flask-users-service
                 '''
+                }
             }
-        }
-    }
+       }
+
 
     post {
         success {
