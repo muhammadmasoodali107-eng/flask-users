@@ -28,18 +28,18 @@ pipeline {
 
         stage('Check Kubernetes / Minikube') {
             steps {
+                withKubeConfig([credentialsId: 'minikube-kubeconfig']) {
                 sh '''
-                    kubectl config use-context minikube
+                echo "Kubernetes Client:"
+                kubectl version --client
 
-                    echo "Kubernetes Client:"
-                    kubectl version --client
+                echo "Current Context:"
+                kubectl config current-context
 
-                    echo "Current Context:"
-                    kubectl config current-context
-
-                    echo "Kubernetes Nodes:"
-                    kubectl get nodes
+                echo "Kubernetes Nodes:"
+                kubectl get nodes
                 '''
+                }
             }
         }
 
